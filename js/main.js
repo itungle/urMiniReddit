@@ -1,31 +1,53 @@
-function init() {
-    getSubRedditList();
-}
+var URL = "http://www.reddit.com/r/";
+var DOTJSON = ".json";
 
-function getSubRedditList() {
+function init() {
     "use strict";
-    var subredditList = [];
+    var subredditList;
     chrome.storage.sync.get("subreddits", function(data) {
         if (typeof data.subreddits == "undefined") {
-            subredditList.push("popular");
-            subredditList.push("all");
-            subredditList.push("random");
+            subredditList = {
+                "popular": URL + "popular" + DOTJSON,
+                "random": URL + "random" + DOTJSON,
+                "all": URL + "all" + DOTJSON
+            };
+            chrome.storage.sync.set({ "subreddits": subredditList }, function() {
+                displaySubredditBar(subredditList);
+            });
         } else {
             subredditList = data.subreddits;
+            console.log(subredditList);
+            displaySubredditBar(data.subreddits);
         }
-        console.log(data.subreddits);
     });
-    // console.log(subredditList.toString());
-    return subredditList;
 };
 
+function displaySubredditBar(subreddits) {
+    var nameBar = $("#subreddits-bar");
+    $(nameBar).empty();
+    for (var name in subreddits) {
+        $(nameBar).append("<a class='anchor-margin'>" + name + "</a>");
+    }
+}
 
-$(document).ready(function() {
-    console.log("ready");
+var main = function() {
+    //chrome.storage.sync.clear();
+    init();
+}
 
-    console.log(subredditList.toString());
-    $("#addNewSubredditButton").on("click", function() {
-        var subreddit = $("#subredditName").val();
-        $("#subredits").append("<a>" + subreddit + "</a>");
-    });
-});
+var addNewSubreddit = function() {
+    var newName = $("#subredditName").val();
+    console.log(newName);
+    chrome.storage.sync.get("subreddits", function(data) {
+        var subreddits = data.subreddits;
+        subreddits[newName] = URL + newName + DOTJSON;
+        chrome.storage.sync.set({ "subreddits": subreddits }, function() {
+            console.log("success");
+            displaySubredditBar(subreddits);
+            console.log(subreddits);
+        })
+    })
+}
+
+document.getElementById("addNewSubredditButton").addEventListener("click", addNewSubreddit);
+document.addEventListener("DOMContentLoaded", main);
