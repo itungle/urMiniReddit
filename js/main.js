@@ -23,16 +23,11 @@ function init() {
 };
 
 function displaySubredditBar(subreddits) {
-    var nameBar = $("#subreddits-bar");
+    var nameBar = $("#item-list");
     $(nameBar).empty();
     for (var name in subreddits) {
-        $(nameBar).append("<a class='anchor-margin'>" + name + "</a>");
+        $(nameBar).append("<div><a class='anchor-margin'>" + name + "</a></div>");
     }
-}
-
-var main = function() {
-    //chrome.storage.sync.clear();
-    init();
 }
 
 var addNewSubreddit = function() {
@@ -40,14 +35,23 @@ var addNewSubreddit = function() {
     console.log(newName);
     chrome.storage.sync.get("subreddits", function(data) {
         var subreddits = data.subreddits;
-        subreddits[newName] = URL + newName + DOTJSON;
-        chrome.storage.sync.set({ "subreddits": subreddits }, function() {
-            console.log("success");
-            displaySubredditBar(subreddits);
-            console.log(subreddits);
-        })
+        if (subreddits[newName] === "undefined") {
+            subreddits[newName] = URL + newName + DOTJSON;
+            chrome.storage.sync.set({ "subreddits": subreddits }, function() {
+                console.log("success");
+                displaySubredditBar(subreddits);
+                console.log(subreddits);
+            })
+        } else {
+            var errorMsg = "Subreddit existed in your list";
+        }
     })
 }
 
+
+var main = function() {
+    //chrome.storage.sync.clear();
+    init();
+}
 document.getElementById("addNewSubredditButton").addEventListener("click", addNewSubreddit);
 document.addEventListener("DOMContentLoaded", main);
