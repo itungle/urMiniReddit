@@ -3,6 +3,10 @@
     width: 100%;
 }
 
+.form-margin {
+    margin: 10px 5px;
+}
+
 .flex-col-container {
     display: -webkit-box;
     display: -moz-box;
@@ -24,8 +28,8 @@
     width: 40%;
 }
 
-.anchor-margin {
-    margin: 5px 10px;
+.btn-name-width {
+    width: 150px;
 }
 
 .pink-border-bottom {
