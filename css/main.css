@@ -32,6 +32,22 @@
     width: 150px;
 }
 
+.menu-margin-left {
+    margin: 0 0 0 5px;
+}
+
+.menu-height {
+    height: 80%;
+}
+
+.overflow-item {
+    overflow: scroll;
+}
+
+.error-msg-color {
+    color: red;
+}
+
 .pink-border-bottom {
     border-bottom: 1px solid hotpink;
 }
