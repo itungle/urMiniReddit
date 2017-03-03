@@ -43,6 +43,7 @@ var addNewSubreddit = function() {
         subreddits[newName] = URL + newName + DOTJSON;
         chrome.storage.sync.set({ "subreddits": subreddits }, function() {
             console.log("success");
+            console.log(subreddits[newName]);
             displaySubredditBar(subreddits);
             console.log(subreddits);
         })
