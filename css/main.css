@@ -41,7 +41,8 @@
 }
 
 .overflow-item {
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .error-msg-color {

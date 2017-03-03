@@ -28,7 +28,6 @@ function init() {
             });
         } else {
             subredditList = data.subreddits;
-            console.log(subredditList);
             displaySubredditBar(data.subreddits);
         }
     });
@@ -39,16 +38,26 @@ function init() {
  * @param {String} name : name of subreddit the user want to add to menu list
  * @return {String} template : return a html string to be append in to menu
  */
-function newSubredditTemplate(name) {
+function newSubredditNameTemplate(name) {
     var openDiv = "<div class='row'>";
     var removeBtnCol = "<div class='col-xs-2'>";
     var removeBtn = "<button type='button' class='glyphicon glyphicon-minus-sign btn btn-default btn-sm btn-danger remove-btns' id='" + name + "'></button>";
     var anchorCol = "<div class='col-xs-10'>";
-    var anchorBtn = "<a class='btn btn-default btn-name-width ' role='button'>" + name + "</a>";
+    var anchorBtn = "<a class='btn btn-default btn-name-width show-threads-btns' role='button'>" + name + "</a>";
     var closeDiv = "</div>";
     var template = openDiv + removeBtnCol + removeBtn + closeDiv + anchorCol + anchorBtn + closeDiv + closeDiv;
     return template;
 }
+
+
+function newSubredditThreadTemplate(object) {
+    var thumbnail, score, title, comments_link, num_comments, author, thread_link;
+    thumbnail = object.data.thumbnail;
+    score = object.data.score;
+    comments_link = object.data.permalink;
+
+}
+
 /**
  * Dynamically add event into collection
  * @param {HTMLCollection} collection : collections of item to add into event
@@ -63,6 +72,36 @@ function addEventIntoCollection(collection, event, func) {
 }
 
 /**
+ * Get subreddit data (object) and call display subreddit
+ * @param {event} event : onClicked of subreddit name
+ */
+function getSubredditData(event) {
+    var name = event.target.text;
+    chrome.storage.sync.get("subreddits", function(data) {
+        var subreddits = data.subreddits;
+        var url = subreddits[name];
+        console.log(name);
+        console.log(url);
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function(data) {
+                displayThreads(data);
+            }
+        });
+    });
+}
+
+/**
+ * Display threads of the clicked subreddit
+ * @param {Object} data : object data of subreddits (title, threads, etc);
+ */
+function displayThreads(data) {
+    var children = data.data.children;
+    console.log(children[0]);
+}
+
+/**
  * Display the objects into subreddit menu list
  * @param {object} subreddits : object that has subreddit name as key and url as value 
  */
@@ -70,11 +109,13 @@ function displaySubredditBar(subreddits) {
     var nameBar = $("#menu");
     $(nameBar).empty();
     for (var name in subreddits) {
-        var template = newSubredditTemplate(name);
+        var template = newSubredditNameTemplate(name);
         $(nameBar).append(template);
     }
     var removeBtnCollection = ".remove-btns";
+    var showThreadsBtnCollection = ".show-threads-btns";
     addEventIntoCollection(removeBtnCollection, "click", removeSubreddit);
+    addEventIntoCollection(showThreadsBtnCollection, "click", getSubredditData);
 }
 
 /**
@@ -88,7 +129,7 @@ function isNameValid(name) {
 
 /**
  * Remove subreddit from the display and from the storage
- * @param {event} event : click of the button
+ * @param {event} event : onClick of remove button
  */
 function removeSubreddit(event) {
     var idToRemove = event.target.id;
@@ -103,7 +144,7 @@ function removeSubreddit(event) {
 /**
  * Add new subreddit into menu list
  */
-var addNewSubreddit = function() {
+function addNewSubreddit() {
     var newName = $("#subreddit-name").val();
     $("#error-message").html("");
     var errorMsg;
@@ -133,7 +174,7 @@ var addNewSubreddit = function() {
 /**
  * Main function to kick off when dom is loaded
  */
-var main = function() {
+function main() {
     //chrome.storage.sync.clear();
     init();
 }
