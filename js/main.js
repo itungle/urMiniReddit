@@ -6,7 +6,7 @@ var URL = "http://www.reddit.com/r/";
 /**
  * postfix URL for subreddits to get json response
  */
-var DOTJSON = ".json";
+var DOTJSON = "/.json";
 
 /**
  * initialize menu list using chrome storage sync.
@@ -50,12 +50,39 @@ function newSubredditNameTemplate(name) {
 }
 
 
-function newSubredditThreadTemplate(object) {
-    var thumbnail, score, title, comments_link, num_comments, author, thread_link;
-    thumbnail = object.data.thumbnail;
+function buildSingleThreadTemplate(object) {
+    var thumbnail, score, title, comments_link, num_comments, author, thread_link, nsfw_tag;
+    if (object.data.thumbnail === "self") {
+        thumbnail = "../images/Reddit-icon.png";
+    } else {
+        thumbnail = object.data.thumbnail;
+    }
+    title = object.data.title;
+    author = object.data.author;
+
     score = object.data.score;
     comments_link = object.data.permalink;
+    num_comments = object.data.num_comments;
+    thread_link = object.data.url;
+    nsfw_tag = object.data.over_18;
 
+    var scoreAndThumbnailSection = buildScoreAndThumbnailTemplate(score, thumbnail);
+
+    var template = "<div>" + scoreAndThumbnailSection + "</div>";
+
+    $("#sub-contents").append(template);
+
+}
+
+function buildScoreAndThumbnailTemplate(score, thumbnail) {
+
+    var openDiv = "<div>";
+    var scoreSection = "<p>" + score + "</p>";
+    var thumbnailSection = "<img src='" + thumbnail + "' width='40' height='40'>"
+    var closeDiv = "</div>";
+
+    var template = openDiv + scoreSection + thumbnailSection + closeDiv;
+    return template;
 }
 
 /**
@@ -98,7 +125,7 @@ function getSubredditData(event) {
  */
 function displayThreads(data) {
     var children = data.data.children;
-    console.log(children[0]);
+    buildSingleThreadTemplate(children[0]);
 }
 
 /**
