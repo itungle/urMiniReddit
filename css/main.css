@@ -1,3 +1,54 @@
-.anchor-margin {
-    margin: 5px 10px;
+.main {
+    height: 100%;
+    width: 100%;
+}
+
+.form-margin {
+    margin: 10px 5px;
+}
+
+.flex-col-container {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row-container {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.left-side-content {
+    width: 40%;
+}
+
+.btn-name-width {
+    width: 150px;
+}
+
+.menu-margin-left {
+    margin: 0 0 0 5px;
+}
+
+.menu-height {
+    height: 80%;
+}
+
+.overflow-item {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.error-msg-color {
+    color: red;
+}
+
+.pink-border-bottom {
+    border-bottom: 1px solid hotpink;
 }
