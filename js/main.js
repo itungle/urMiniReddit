@@ -14,7 +14,6 @@ var DOTJSON = ".json";
  */
 function init() {
     "use strict";
-    $("#error-message").html("");
     var subredditList;
     chrome.storage.sync.get("subreddits", function(data) {
         if (typeof data.subreddits == "undefined") {
@@ -103,7 +102,7 @@ function removeSubreddit(event) {
 /**
  * Add new subreddit into menu list
  */
-var addNewSubreddit = function() {
+function addNewSubreddit() {
     var newName = $("#subreddit-name").val();
     $("#error-message").html("");
     var errorMsg;
@@ -133,7 +132,7 @@ var addNewSubreddit = function() {
 /**
  * Main function to kick off when dom is loaded
  */
-var main = function() {
+function main() {
     //chrome.storage.sync.clear();
     init();
 }
