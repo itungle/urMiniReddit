@@ -46,9 +46,14 @@
 }
 
 .error-msg-color {
-    color: red;
+    color: #ff0000;
 }
 
 .pink-border-bottom {
-    border-bottom: 1px solid hotpink;
+    border-bottom: 1px solid #ff69b4;
+}
+
+.left-col {
+    margin: 5px 0;
+    border: 1px solid #ff69b4
 }

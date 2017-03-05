@@ -52,7 +52,7 @@ function newSubredditNameTemplate(name) {
 
 function buildSingleThreadTemplate(object) {
     var thumbnail, score, title, comments_link, num_comments, author, thread_link, nsfw_tag;
-    if (object.data.thumbnail === "self") {
+    if (object.data.thumbnail === "self" || object.data.thumbnail === "") {
         thumbnail = "../images/Reddit-icon.png";
     } else {
         thumbnail = object.data.thumbnail;
@@ -60,30 +60,40 @@ function buildSingleThreadTemplate(object) {
     title = object.data.title;
     author = object.data.author;
 
-    score = object.data.score;
+    score = scoreFormatter(object.data.score);
     comments_link = object.data.permalink;
     num_comments = object.data.num_comments;
     thread_link = object.data.url;
     nsfw_tag = object.data.over_18;
 
-    var scoreAndThumbnailSection = buildScoreAndThumbnailTemplate(score, thumbnail);
-
-    var template = "<div>" + scoreAndThumbnailSection + "</div>";
+    var scoreSection = buildScoreTemplate(score);
+    var thumbnailSection = buildThumbnailTemplate(thumbnail);
+    var template = "<div><div class='left-col'>" + scoreSection + thumbnailSection + "</div></div>";
 
     $("#sub-contents").append(template);
 
 }
 
-function buildScoreAndThumbnailTemplate(score, thumbnail) {
-
-    var openDiv = "<div>";
-    var scoreSection = "<p>" + score + "</p>";
-    var thumbnailSection = "<img src='" + thumbnail + "' width='40' height='40'>"
+function buildScoreTemplate(score) {
+    var openDiv = "<div class='text-center'>";
+    var scoreSection = "<span>" + score + "</span>";
     var closeDiv = "</div>";
-
-    var template = openDiv + scoreSection + thumbnailSection + closeDiv;
+    var template = openDiv + scoreSection + closeDiv;
     return template;
 }
+
+function scoreFormatter(score) {
+    return score > 999 ? (score / 1000).toFixed(1) + 'k' : score;
+}
+
+function buildThumbnailTemplate(thumbnail) {
+    var openDiv = "<div class='text-center'>";
+    var thumbnailSection = "<img src='" + thumbnail + "' width='40' height='40'>"
+    var closeDiv = "</div>";
+    var template = openDiv + thumbnailSection + closeDiv;
+    return template;
+}
+
 
 /**
  * Dynamically add event into collection
@@ -125,6 +135,7 @@ function getSubredditData(event) {
  */
 function displayThreads(data) {
     var children = data.data.children;
+    console.log(children);
     buildSingleThreadTemplate(children[0]);
 }
 
