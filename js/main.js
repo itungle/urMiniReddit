@@ -68,12 +68,22 @@ function buildSingleThreadTemplate(object) {
 
     var scoreSection = buildScoreTemplate(score);
     var thumbnailSection = buildThumbnailTemplate(thumbnail);
-    var template = "<div><div class='left-col'>" + scoreSection + thumbnailSection + "</div></div>";
+
+    var titleSection = buildTitleTemplate(title, thread_link);
+
+
+    var template = "<div class='row'><div class='left-col col-xs-2'>" + scoreSection + thumbnailSection + "</div><div class='right-col col-xs-10' style='font:10px;'>" + titleSection + "</div></div>";
+
 
     $("#sub-contents").append(template);
-
 }
 
+
+/**
+ * Return template of score
+ * @param {score} score : score of thread
+ * @return {string} template : html template of score section
+ */
 function buildScoreTemplate(score) {
     var openDiv = "<div class='text-center'>";
     var scoreSection = "<span>" + score + "</span>";
@@ -82,15 +92,33 @@ function buildScoreTemplate(score) {
     return template;
 }
 
+/**
+ * format score if it is greater than 999
+ * @param {number} score : score of thread
+ * @return {string} score : if num > 999, then return abbreviation of score (19000 -> 19k)
+ */
 function scoreFormatter(score) {
     return score > 999 ? (score / 1000).toFixed(1) + 'k' : score;
 }
 
+/**
+ * Return template of thumbnail
+ * @param {string} thumbnail : thumbnail link of the thread
+ * @return {string} template : html template of thumbnail section
+ */
 function buildThumbnailTemplate(thumbnail) {
     var openDiv = "<div class='text-center'>";
     var thumbnailSection = "<img src='" + thumbnail + "' width='40' height='40'>"
     var closeDiv = "</div>";
     var template = openDiv + thumbnailSection + closeDiv;
+    return template;
+}
+
+function buildTitleTemplate(title, url) {
+    var openDiv = "<div class='text-left'>";
+    var titleSection = "<a href='" + url + "'>" + title + "</a>";
+    var closeDiv = "</div>";
+    var template = openDiv + titleSection + closeDiv;
     return template;
 }
 
