@@ -52,8 +52,10 @@ function newSubredditNameTemplate(name) {
 
 function buildSingleThreadTemplate(object) {
     var thumbnail, score, title, commentsLink, numComments, author, threadLink, nsfwTag;
-    if (object.data.thumbnail === "self" || object.data.thumbnail === "") {
+    if (object.data.thumbnail === "self" || object.data.thumbnail === "" || object.data.thumbnail === "default") {
         thumbnail = "../images/Reddit-icon.png";
+    } else if (object.data.thumbnail === "nsfw") {
+
     } else {
         thumbnail = object.data.thumbnail;
     }
@@ -63,7 +65,6 @@ function buildSingleThreadTemplate(object) {
     score = scoreFormatter(object.data.score);
     commentLink = object.data.permalink;
     numComments = object.data.num_comments;
-    console.log(typeof(numComments));
     threadLink = object.data.url;
     nsfwTag = object.data.over_18;
 
@@ -71,13 +72,12 @@ function buildSingleThreadTemplate(object) {
     var thumbnailSection = buildThumbnailTemplate(thumbnail);
 
     var titleSection = buildTitleTemplate(title, threadLink);
-    var commentSection = buildThreadInfoTemplate(commentsLink, numComments, author, nsfwTag);
+    var commentSection = buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag);
 
-    var template = "<div class='row'><div class='left-col col-xs-offset-1 col-xs-2'>" + scoreSection + thumbnailSection + "</div><div class='right-col col-xs-9'><div class='row'" + titleSection + "<div class='row'>" + commentSection + "</div></div>";
+    var template = "<div class='row row-margin'><div class='left-col col-xs-offset-1 col-xs-2'>" + scoreSection + thumbnailSection + "</div><div class='right-col col-xs-9'><div class='row'" + titleSection + "<div class='row'>" + commentSection + "</div></div></div>";
     // var template = "<div class='flex-row-container'><div class='left-col flex-item'>" + scoreSection + thumbnailSection + "</div><div class='right-col flex-item'>" + titleSection + "</div></div>";
 
-
-    $("#sub-contents").append(template);
+    return template;
 }
 
 
@@ -109,7 +109,7 @@ function buildThumbnailTemplate(thumbnail) {
 
 function buildTitleTemplate(title, url) {
     var openDiv = "<div class='text-left'>";
-    var titleSection = "<a href='" + url + "' class='small-font'>" + title + "</a>";
+    var titleSection = "<a href='" + url + "' class='small-font' target='_blank'>" + title + "</a>";
     var closeDiv = "</div>";
     var template = openDiv + titleSection + closeDiv;
     return template;
@@ -127,11 +127,11 @@ function buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag) {
     }
     var openDiv = "<div class='text-left row small-font'>";
 
-    var commentSection = "<div class='col-xs-4'><a href='" + commentLink + "' class='no-decoration'>" + commentSpan + "</a></div>";
+    var commentSection = "<div class='col-xs-4'><a href='http://www.reddit.com" + commentLink + "' class='no-decoration' target='_blank'>" + commentSpan + "</a></div>";
     var authorSection = "<div class='col-xs-4'><span>" + author + "</span></div>";
 
     if (nsfwTag) {
-        nsfwSection = "<div class='col-xs-1'><span>NSFW</span></div>";
+        nsfwSection = "<div class='col-xs-4'><span>NSFW</span></div>";
     } else {
         nsfwSection = "";
     }
@@ -173,12 +173,13 @@ function getSubredditData(event) {
     chrome.storage.sync.get("subreddits", function(data) {
         var subreddits = data.subreddits;
         var url = subreddits[name];
-        console.log(name);
-        console.log(url);
         $.ajax({
             type: "GET",
             url: url,
             success: function(data) {
+                var currentSub = "<a class='no-decoration' href='" + URL + name + "' target='_blank'>/r/" + name + "</a>";
+                $("#current-subreddit").empty();
+                $("#current-subreddit").append(currentSub);
                 displayThreads(data);
             }
         });
@@ -190,9 +191,14 @@ function getSubredditData(event) {
  * @param {Object} data : object data of subreddits (title, threads, etc);
  */
 function displayThreads(data) {
+
     var children = data.data.children;
-    console.log(children);
-    buildSingleThreadTemplate(children[0]);
+    var toAppendThreads = "";
+    for (var i = 0; i < children.length; i++) {
+        toAppendThreads = toAppendThreads + buildSingleThreadTemplate(children[i]);
+    }
+    $("#sub-contents").empty();
+    $("#sub-contents").append(toAppendThreads);
 }
 
 /**
@@ -249,7 +255,6 @@ function addNewSubreddit() {
             if (!(newName in subreddits)) {
                 subreddits[newName] = URL + newName + DOTJSON;
                 chrome.storage.sync.set({ "subreddits": subreddits }, function() {
-                    console.log("successfully added new subreddit");
                     displaySubredditBar(subreddits);
                 });
                 $("#error-message").html("");

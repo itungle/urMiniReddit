@@ -67,9 +67,14 @@
 
 .left-col {
     /*margin: 5px 0;*/
-    border: 1px solid #ff69b4
+    /*border: 1px solid #ff69b4*/
+}
+
+.row-margin {
+    margin: 5px 0;
 }
 
 .no-decoration {
     text-decoration: none;
+    color: #000000;
 }
