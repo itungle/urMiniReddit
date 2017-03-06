@@ -51,7 +51,7 @@ function newSubredditNameTemplate(name) {
 
 
 function buildSingleThreadTemplate(object) {
-    var thumbnail, score, title, comments_link, num_comments, author, thread_link, nsfw_tag;
+    var thumbnail, score, title, commentsLink, numComments, author, threadLink, nsfwTag;
     if (object.data.thumbnail === "self" || object.data.thumbnail === "") {
         thumbnail = "../images/Reddit-icon.png";
     } else {
@@ -61,18 +61,20 @@ function buildSingleThreadTemplate(object) {
     author = object.data.author;
 
     score = scoreFormatter(object.data.score);
-    comments_link = object.data.permalink;
-    num_comments = object.data.num_comments;
-    thread_link = object.data.url;
-    nsfw_tag = object.data.over_18;
+    commentLink = object.data.permalink;
+    numComments = object.data.num_comments;
+    console.log(typeof(numComments));
+    threadLink = object.data.url;
+    nsfwTag = object.data.over_18;
 
     var scoreSection = buildScoreTemplate(score);
     var thumbnailSection = buildThumbnailTemplate(thumbnail);
 
-    var titleSection = buildTitleTemplate(title, thread_link);
+    var titleSection = buildTitleTemplate(title, threadLink);
+    var commentSection = buildThreadInfoTemplate(commentsLink, numComments, author, nsfwTag);
 
-
-    var template = "<div class='row'><div class='left-col col-xs-2'>" + scoreSection + thumbnailSection + "</div><div class='right-col col-xs-10' style='font:10px;'>" + titleSection + "</div></div>";
+    var template = "<div class='row'><div class='left-col col-xs-offset-1 col-xs-2'>" + scoreSection + thumbnailSection + "</div><div class='right-col col-xs-9'><div class='row'" + titleSection + "<div class='row'>" + commentSection + "</div></div>";
+    // var template = "<div class='flex-row-container'><div class='left-col flex-item'>" + scoreSection + thumbnailSection + "</div><div class='right-col flex-item'>" + titleSection + "</div></div>";
 
 
     $("#sub-contents").append(template);
@@ -93,15 +95,6 @@ function buildScoreTemplate(score) {
 }
 
 /**
- * format score if it is greater than 999
- * @param {number} score : score of thread
- * @return {string} score : if num > 999, then return abbreviation of score (19000 -> 19k)
- */
-function scoreFormatter(score) {
-    return score > 999 ? (score / 1000).toFixed(1) + 'k' : score;
-}
-
-/**
  * Return template of thumbnail
  * @param {string} thumbnail : thumbnail link of the thread
  * @return {string} template : html template of thumbnail section
@@ -116,12 +109,47 @@ function buildThumbnailTemplate(thumbnail) {
 
 function buildTitleTemplate(title, url) {
     var openDiv = "<div class='text-left'>";
-    var titleSection = "<a href='" + url + "'>" + title + "</a>";
+    var titleSection = "<a href='" + url + "' class='small-font'>" + title + "</a>";
     var closeDiv = "</div>";
     var template = openDiv + titleSection + closeDiv;
     return template;
 }
 
+function buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag) {
+    var commentSpan;
+    var nsfwSection;
+    if (numComments == 0) {
+        commentSpan = "comment";
+    } else if (numComments == 1) {
+        commentSpan = "1 comment";
+    } else {
+        commentSpan = numComments + " comments";
+    }
+    var openDiv = "<div class='text-left row small-font'>";
+
+    var commentSection = "<div class='col-xs-4'><a href='" + commentLink + "' class='no-decoration'>" + commentSpan + "</a></div>";
+    var authorSection = "<div class='col-xs-4'><span>" + author + "</span></div>";
+
+    if (nsfwTag) {
+        nsfwSection = "<div class='col-xs-1'><span>NSFW</span></div>";
+    } else {
+        nsfwSection = "";
+    }
+    var template = openDiv + commentSection + authorSection + nsfwSection + "</div>";
+
+    return template;
+
+}
+
+
+/**
+ * format score if it is greater than 999
+ * @param {number} score : score of thread
+ * @return {string} score : if num > 999, then return abbreviation of score (19000 -> 19k)
+ */
+function scoreFormatter(score) {
+    return score > 999 ? (score / 1000).toFixed(1) + 'k' : score;
+}
 
 /**
  * Dynamically add event into collection

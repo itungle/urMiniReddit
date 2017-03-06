@@ -3,6 +3,14 @@
     width: 100%;
 }
 
+.left-side-content {
+    width: 35%;
+}
+
+.small-font {
+    font-size: 11px;
+}
+
 .form-margin {
     margin: 10px 5px;
 }
@@ -24,8 +32,8 @@
     display: flex;
 }
 
-.left-side-content {
-    width: 40%;
+.flex-item {
+    flex: 0 0 auto;
 }
 
 .btn-name-width {
@@ -38,6 +46,10 @@
 
 .menu-height {
     height: 80%;
+}
+
+.sub-contents-height {
+    height: 90%;
 }
 
 .overflow-item {
@@ -54,6 +66,10 @@
 }
 
 .left-col {
-    margin: 5px 0;
+    /*margin: 5px 0;*/
     border: 1px solid #ff69b4
+}
+
+.no-decoration {
+    text-decoration: none;
 }

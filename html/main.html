@@ -13,17 +13,23 @@
 </head>
 
 <body>
+
     <div class="flex-row-container main">
         <div class="left-side-content">
             <div class="title text-center">
                 <span class="pink-border-bottom"><b>Ur Mini Reddit</b></span>
             </div>
-            <div class="form-group new-item-form form-margin">
+            <div class="text-center">
                 <span id="error-message" class="error-msg-color"></span>
-                <input type="text" class="form-group" name="subreddit-name" placeholder="subreddit name ('nba')" id="subreddit-name">
-                <button type="button" class="btn btn-default btn-sm btn-success" id="add-new-subreddit-btn">
-                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                </button>
+            </div>
+
+            <div class="flex-row-container form-margin">
+                <div class="flex-item">
+                    <input type="text" class="form-group input-sm" name=" subreddit-name" placeholder="subreddit name ( 'nba')" id="subreddit-name">
+                </div>
+                <div class="flex-item">
+                    <button type="button" class="btn btn-default btn-sm btn-success glyphicon glyphicon-plus-sign" id="add-new-subreddit-btn"></button>
+                </div>
             </div>
             <div id="menu" class="flex-col-container menu-height menu-margin-left overflow-item">
 
@@ -32,9 +38,10 @@
         <div class="right-side-content">
             <h4 id="current-subreddit"></h4>
             <div id="threads-filter"></div>
-            <div id="sub-contents"></div>
+            <div id="sub-contents" class="sub-contents-height overflow-item"></div>
         </div>
     </div>
+
     <script src="../js/main.js"></script>
 </body>
 
