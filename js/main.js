@@ -6,7 +6,7 @@ var URL = "http://www.reddit.com/r/";
 /**
  * postfix URL for subreddits to get json response
  */
-var DOTJSON = ".json";
+var DOTJSON = "/.json";
 
 /**
  * initialize menu list using chrome storage sync
@@ -50,14 +50,117 @@ function newSubredditNameTemplate(name) {
     return template;
 }
 
+function buildSingleThreadTemplate(object) {
+    var thumbnail, score, title, commentsLink, numComments, author, threadLink, nsfwTag;
+    if (object.data.thumbnail === "self" || object.data.thumbnail === "" || object.data.thumbnail === "default" || object.data.thumbnail === "nsfw") {
+        thumbnail = "../images/Reddit-icon.png";
+    } else {
+        thumbnail = object.data.thumbnail;
+    }
+    title = object.data.title;
+    author = object.data.author;
+
+    score = scoreFormatter(object.data.score);
+    commentLink = object.data.permalink;
+    numComments = object.data.num_comments;
+    threadLink = object.data.url;
+    nsfwTag = object.data.over_18;
+
+    var scoreSection = buildScoreTemplate(score);
+    var thumbnailSection = buildThumbnailTemplate(thumbnail);
+
+    var titleSection = buildTitleTemplate(title, threadLink);
+    var commentSection = buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag);
+
+    var template = "<div class='row row-margin'><div class='left-col col-xs-offset-1 col-xs-2'>" + scoreSection + thumbnailSection + "</div><div class='right-col col-xs-9'><div class='row'" + titleSection + "<div class='row'>" + commentSection + "</div></div></div>";
+    // var template = "<div class='flex-row-container'><div class='left-col flex-item'>" + scoreSection + thumbnailSection + "</div><div class='right-col flex-item'>" + titleSection + "</div></div>";
+
+    return template;
+}
 
 
-function newSubredditThreadTemplate(object) {
-    var thumbnail, score, title, comments_link, num_comments, author, thread_link;
-    thumbnail = object.data.thumbnail;
-    score = object.data.score;
-    comments_link = object.data.permalink;
+/**
+ * Return template of score
+ * @param {score} score : score of thread
+ * @return {string} template : html template of score section
+ */
+function buildScoreTemplate(score) {
+    var openDiv = "<div class='text-center'>";
+    var scoreSection = "<span>" + score + "</span>";
+    var closeDiv = "</div>";
+    var template = openDiv + scoreSection + closeDiv;
+    return template;
+}
 
+/**
+ * Return template of thumbnail
+ * @param {string} thumbnail : thumbnail link of the thread
+ * @return {string} template : html template of thumbnail section
+ */
+function buildThumbnailTemplate(thumbnail) {
+    var openDiv = "<div class='text-center'>";
+    var thumbnailSection = "<img src='" + thumbnail + "' width='40' height='40'>"
+    var closeDiv = "</div>";
+    var template = openDiv + thumbnailSection + closeDiv;
+    return template;
+}
+
+/**
+ * Return template of title in each thread
+ * @param {string} title : thread title
+ * @param {string} url : link to threads or other sources (news, etc);
+ * @return {string} template : string template to be added into the overall tempalte
+ */
+function buildTitleTemplate(title, url) {
+    var openDiv = "<div class='text-left'>";
+    var titleSection = "<a href='" + url + "' class='small-font' target='_blank'>" + title + "</a>";
+    var closeDiv = "</div>";
+    var template = openDiv + titleSection + closeDiv;
+    return template;
+}
+
+/**
+ * Return template: # comments      author      nsfwTag
+ * @param {string} commentLink 
+ * @param {number} numComments 
+ * @param {string} author 
+ * @param {string} nsfwTag
+ * @return {string} template : info template
+ */
+function buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag) {
+    var commentSpan;
+    var nsfwSection;
+    if (numComments == 0) {
+        commentSpan = "comment";
+    } else if (numComments == 1) {
+        commentSpan = "1 comment";
+    } else {
+        commentSpan = numComments + " comments";
+    }
+    var openDiv = "<div class='text-left row small-font'>";
+
+    var commentSection = "<div class='col-xs-4'><a href='http://www.reddit.com" + commentLink + "' class='no-decoration' target='_blank'>" + commentSpan + "</a></div>";
+    var authorSection = "<div class='col-xs-4'><span>" + author + "</span></div>";
+
+    if (nsfwTag) {
+        nsfwSection = "<div class='col-xs-4'><span>NSFW</span></div>";
+    } else {
+        nsfwSection = "";
+    }
+    var template = openDiv + commentSection + authorSection + nsfwSection + "</div>";
+
+    return template;
+
+}
+
+
+/**
+ * format score if it is greater than 999
+ * @param {number} score : score of thread
+ * @return {string} score : if num > 999, then return abbreviation of score (19000 -> 19k)
+ */
+function scoreFormatter(score) {
+    return score > 999 ? (score / 1000).toFixed(1) + 'k' : score;
 }
 
 /**
@@ -74,7 +177,6 @@ function addEventIntoCollection(collection, event, func) {
 }
 
 /**
-
  * Get subreddit data (object) and call display subreddit
  * @param {event} event : onClicked of subreddit name
  */
@@ -83,12 +185,13 @@ function getSubredditData(event) {
     chrome.storage.sync.get("subreddits", function(data) {
         var subreddits = data.subreddits;
         var url = subreddits[name];
-        console.log(name);
-        console.log(url);
         $.ajax({
             type: "GET",
             url: url,
             success: function(data) {
+                var currentSub = "<a class='no-decoration' href='" + URL + name + "' target='_blank'>/r/" + name + "</a>";
+                $("#current-subreddit").empty();
+                $("#current-subreddit").append(currentSub);
                 displayThreads(data);
             }
         });
@@ -100,8 +203,14 @@ function getSubredditData(event) {
  * @param {Object} data : object data of subreddits (title, threads, etc);
  */
 function displayThreads(data) {
+
     var children = data.data.children;
-    console.log(children[0]);
+    var toAppendThreads = "";
+    for (var i = 0; i < children.length; i++) {
+        toAppendThreads = toAppendThreads + buildSingleThreadTemplate(children[i]);
+    }
+    $("#sub-contents").empty();
+    $("#sub-contents").append(toAppendThreads);
 }
 
 /**
@@ -158,7 +267,6 @@ function addNewSubreddit() {
             if (!(newName in subreddits)) {
                 subreddits[newName] = URL + newName + DOTJSON;
                 chrome.storage.sync.set({ "subreddits": subreddits }, function() {
-                    console.log("successfully added new subreddit");
                     displaySubredditBar(subreddits);
                 });
                 $("#error-message").html("");
