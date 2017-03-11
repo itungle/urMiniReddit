@@ -9,7 +9,7 @@ var URL = "http://www.reddit.com/r/";
 var DOTJSON = "/.json";
 
 /**
- * initialize menu list using chrome storage sync.
+ * initialize menu list using chrome storage sync
  * And add event listener to the each remove btn
  */
 function init() {
@@ -38,6 +38,7 @@ function init() {
  * @param {String} name : name of subreddit the user want to add to menu list
  * @return {String} template : return a html string to be append in to menu
  */
+
 function newSubredditNameTemplate(name) {
     var openDiv = "<div class='row'>";
     var removeBtnCol = "<div class='col-xs-2'>";
@@ -54,6 +55,7 @@ function newSubredditNameTemplate(name) {
  * @param {object} object : each thread's data
  * @return {string} template : string all templates combined to be one thread template
  */
+
 function buildSingleThreadTemplate(object) {
     var thumbnail, score, title, commentsLink, numComments, author, threadLink, nsfwTag;
     if (object.data.thumbnail === "self" || object.data.thumbnail === "" || object.data.thumbnail === "default" || object.data.thumbnail === "nsfw") {
@@ -105,9 +107,10 @@ function buildThumbnailTemplate(thumbnail) {
 
 
 /**
- * Return title template
- * @param {string} title 
- * @param {string} url 
+ * Return template of title in each thread
+ * @param {string} title : thread title
+ * @param {string} url : link to threads or other sources (news, etc);
+ * @return {string} template : string template to be added into the overall template
  */
 function buildTitleTemplate(title, url) {
     var openDiv = "<div class='text-left'>";
@@ -118,11 +121,12 @@ function buildTitleTemplate(title, url) {
 }
 
 /**
- * return thread info template on the right col of thread's template
+ * Return template: # comments      author      nsfwTag
  * @param {string} commentLink 
- * @param {int} numComments 
+ * @param {number} numComments 
  * @param {string} author 
- * @param {string} nsfwTag 
+ * @param {string} nsfwTag
+ * @return {string} template : info template
  */
 function buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag) {
     var commentSpan;
@@ -138,14 +142,12 @@ function buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag) {
 
     var commentSection = "<div class='col-xs-4'><a href='http://www.reddit.com" + commentLink + "' class='no-decoration' target='_blank'>" + commentSpan + "</a></div>";
     var authorSection = "<div class='col-xs-4'><span>" + author + "</span></div>";
-
     if (nsfwTag) {
         nsfwSection = "<div class='col-xs-4'><span>NSFW</span></div>";
     } else {
         nsfwSection = "";
     }
     var template = openDiv + commentSection + authorSection + nsfwSection + "</div>";
-
     return template;
 
 }
@@ -264,6 +266,37 @@ function addNewSubreddit() {
             if (!(newName in subreddits)) {
                 subreddits[newName] = URL + newName + DOTJSON;
                 chrome.storage.sync.set({ "subreddits": subreddits }, function() {
+                    displaySubredditBar(subreddits);
+                });
+                $("#error-message").html("");
+                $("#subreddit-name").val("");
+            } else {
+                errorMsg = "Subreddit already existed";
+                $("#error-message").html(errorMsg).css('color', 'red');
+            }
+        });
+    } else {
+        errorMsg = "Invalid name";
+        $("#error-message").html(errorMsg);
+    }
+}
+
+
+/**
+ * Add new subreddit into menu list
+ */
+function addNewSubreddit() {
+    var newName = $("#subreddit-name").val();
+    $("#error-message").html("");
+    var errorMsg;
+    var isValid = isNameValid(newName);
+    if (isValid) {
+        chrome.storage.sync.get("subreddits", function(data) {
+            var subreddits = data.subreddits;
+            if (!(newName in subreddits)) {
+                subreddits[newName] = URL + newName + DOTJSON;
+                chrome.storage.sync.set({ "subreddits": subreddits }, function() {
+                    console.log("successfully added new subreddit");
                     displaySubredditBar(subreddits);
                 });
                 $("#error-message").html("");
