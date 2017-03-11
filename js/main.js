@@ -49,34 +49,30 @@ function newSubredditNameTemplate(name) {
     return template;
 }
 
-
+/**
+ * return template of each thread
+ * @param {object} object : each thread's data
+ * @return {string} template : string all templates combined to be one thread template
+ */
 function buildSingleThreadTemplate(object) {
     var thumbnail, score, title, commentsLink, numComments, author, threadLink, nsfwTag;
-    if (object.data.thumbnail === "self" || object.data.thumbnail === "" || object.data.thumbnail === "default") {
+    if (object.data.thumbnail === "self" || object.data.thumbnail === "" || object.data.thumbnail === "default" || object.data.thumbnail === "nsfw") {
         thumbnail = "../images/Reddit-icon.png";
-    } else if (object.data.thumbnail === "nsfw") {
-
     } else {
         thumbnail = object.data.thumbnail;
     }
     title = object.data.title;
     author = object.data.author;
-
     score = scoreFormatter(object.data.score);
     commentLink = object.data.permalink;
     numComments = object.data.num_comments;
     threadLink = object.data.url;
     nsfwTag = object.data.over_18;
-
     var scoreSection = buildScoreTemplate(score);
     var thumbnailSection = buildThumbnailTemplate(thumbnail);
-
     var titleSection = buildTitleTemplate(title, threadLink);
     var commentSection = buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag);
-
     var template = "<div class='row row-margin'><div class='left-col col-xs-offset-1 col-xs-2'>" + scoreSection + thumbnailSection + "</div><div class='right-col col-xs-9'><div class='row'" + titleSection + "<div class='row'>" + commentSection + "</div></div></div>";
-    // var template = "<div class='flex-row-container'><div class='left-col flex-item'>" + scoreSection + thumbnailSection + "</div><div class='right-col flex-item'>" + titleSection + "</div></div>";
-
     return template;
 }
 
@@ -107,6 +103,12 @@ function buildThumbnailTemplate(thumbnail) {
     return template;
 }
 
+
+/**
+ * Return title template
+ * @param {string} title 
+ * @param {string} url 
+ */
 function buildTitleTemplate(title, url) {
     var openDiv = "<div class='text-left'>";
     var titleSection = "<a href='" + url + "' class='small-font' target='_blank'>" + title + "</a>";
@@ -115,6 +117,13 @@ function buildTitleTemplate(title, url) {
     return template;
 }
 
+/**
+ * return thread info template on the right col of thread's template
+ * @param {string} commentLink 
+ * @param {int} numComments 
+ * @param {string} author 
+ * @param {string} nsfwTag 
+ */
 function buildThreadInfoTemplate(commentLink, numComments, author, nsfwTag) {
     var commentSpan;
     var nsfwSection;
@@ -274,7 +283,6 @@ function addNewSubreddit() {
  * Main function to kick off when dom is loaded
  */
 function main() {
-    //chrome.storage.sync.clear();
     init();
 }
 
